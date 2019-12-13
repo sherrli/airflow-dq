@@ -1,0 +1,12 @@
+test_name: Test
+check_description: This is a description of the test and what it does.
+threshold:
+    eval_threshold: True
+    min_threshold: SELECT MIN(cost) FROM price;
+    max_threshold: SELECT MAX(cost) FROM price;
+    threshold_conn_type: postgres
+    threshold_conn_id: test_id
+fields:
+  conn_id: test_conn
+  conn_type: postgres
+  sql: SELECT MAX(value) FROM test;
