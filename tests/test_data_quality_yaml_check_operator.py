@@ -1,0 +1,132 @@
+import pytest
+import testing.postgresql
+from pathlib import Path
+import psycopg2
+from plugins.data_quality_yaml_check_operator import DataQualityYAMLCheckOperator
+from airflow.hooks.postgres_hook import PostgresHook
+from datetime import datetime
+
+SQL_PATH = Path(__file__).parents[0] / "configs" / "test_sql_table.sql"
+YAML_PATH = Path(__file__).parents[0] / "configs"
+
+def handler(postgresql):
+    """ Preloads postgres with two testing tables. """
+    with open(SQL_PATH) as table_file:
+        test_table = table_file.read()
+
+    conn = psycopg2.connect(**postgresql.dsn())
+    cursor = conn.cursor()
+    cursor.execute(test_table)
+    cursor.close()
+    conn.commit()
+    conn.close()
+
+def get_records_mock(sql):
+    """ Mock function to replace get_records() with unit test mocker. """
+    Postgresql =  testing.postgres.PostgresFactory(
+        on_initialized=handler,
+        cache_initialized_db=True
+    )
+
+    with Postgresql() as psql:
+        conn = psycopg2.connect(**psql.dsn())
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+    return result
+
+def test_inside_threshold_values(mocker):
+    yaml_path = YAML_PATH / "test_inside_threshold_values.yaml"
+
+    mocker.patch.objects(
+        PostgresHook,
+        "get_records",
+        side_effect=get_records_mock
+    )
+
+    task = DataQualityYAMLCheckOperator(
+        task_id="test_task",
+        yaml_path=yaml_path
+    )
+
+    result = task.execute(context={
+        "execution_date" : datetime.now()
+    })
+
+    assert len(result) == 5
+    assert result["within_threshold"]
+
+def test_outside_threshold_values(mocker):
+    yaml_path = YAML_PATH / "test_outside_threshold_values.yaml"
+
+    mocker.patch.objects(
+        PostgresHook,
+        "get_records",
+        side_effect=get_records_mock
+    )
+
+    task = DataQualityYAMLCheckOperator(
+        task_id="test_task",
+        yaml_path=yaml_path
+    )
+
+    result = task.execute(context={
+        "execution_date" : datetime.now()
+    })
+
+    assert len(result) == 5
+    assert not result["within_threshold"]
+
+def test_inside_threshold_eval(mocker):
+    yaml_path = YAML_PATH / "test_inside_threshold_eval.yaml"
+
+    mocker.patch.objects(
+        PostgresHook,
+        "get_records",
+        side_effect=get_records_mock
+    )
+
+    task = DataQualityYAMLCheckOperator(
+        task_id="test_task",
+        yaml_path=yaml_path
+    )
+
+    result = task.execute(context={
+        "execution_date" : datetime.now()
+    })
+
+    assert len(result) == 5
+    assert result["within_threshold"]
+
+def test_outside_threshold_eval(mocker):
+    yaml_path = YAML_PATH / "test_outside_threshold_eval.yaml"
+
+    mocker.patch.objects(
+        PostgresHook,
+        "get_records",
+        side_effect=get_records_mock
+    )
+
+    task = DataQualityYAMLCheckOperator(
+        task_id="test_task",
+        yaml_path=yaml_path
+    )
+
+    result = task.execute(context={
+        "execution_date" : datetime.now()
+    })
+
+    assert len(result) == 5
+    assert not result["within_threshold"]
+
+def test_invalid_yaml_path():
+    yaml_path = YAML_PATH / "nonexistent_file.yaml"
+
+    with pytest.raises(FileExistsError):
+        DataQualityYAMLCheckOperator(
+            task_id='test_task',
+            yaml_path=yaml_path
+        )
