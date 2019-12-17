@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import datetime
+from unittest.mock import Mock
 import pytest
 import testing.postgresql
 import psycopg2
@@ -52,6 +53,7 @@ def test_inside_threshold_values(mocker):
         task_id="test_task",
         yaml_path=yaml_path
     )
+    task.push = Mock(return_value=None)
 
     result = task.execute(context={
         "execution_date" : datetime.now()
@@ -73,6 +75,7 @@ def test_outside_threshold_values(mocker):
         task_id="test_task",
         yaml_path=yaml_path
     )
+    task.push = Mock(return_value=None)
 
     result = task.execute(context={
         "execution_date" : datetime.now()
@@ -94,6 +97,7 @@ def test_inside_threshold_eval(mocker):
         task_id="test_task",
         yaml_path=yaml_path
     )
+    task.push = Mock(return_value=None)
 
     result = task.execute(context={
         "execution_date" : datetime.now()
@@ -115,6 +119,7 @@ def test_outside_threshold_eval(mocker):
         task_id="test_task",
         yaml_path=yaml_path
     )
+    task.push = Mock(return_value=None)
 
     result = task.execute(context={
         "execution_date" : datetime.now()
