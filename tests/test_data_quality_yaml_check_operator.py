@@ -1,10 +1,11 @@
+from pathlib import Path
+from datetime import datetime
 import pytest
 import testing.postgresql
-from pathlib import Path
 import psycopg2
+
 from airflow.operators.data_quality_yaml_check_operator import DataQualityYAMLCheckOperator
 from airflow.hooks.postgres_hook import PostgresHook
-from datetime import datetime
 
 SQL_PATH = Path(__file__).parents[0] / "configs" / "test_sql_table.sql"
 YAML_PATH = Path(__file__).parents[0] / "configs"
@@ -23,7 +24,7 @@ def handler(postgresql):
 
 def get_records_mock(sql):
     """ Mock function to replace get_records() with unit test mocker. """
-    Postgresql =  testing.postgres.PostgresFactory(
+    Postgresql = testing.postgresql.PostgresqlFactory(
         on_initialized=handler,
         cache_initialized_db=True
     )
