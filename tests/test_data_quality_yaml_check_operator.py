@@ -2,7 +2,7 @@ import pytest
 import testing.postgresql
 from pathlib import Path
 import psycopg2
-from plugins.data_quality_yaml_check_operator import DataQualityYAMLCheckOperator
+from airflow.operator.data_quality_yaml_check_operator import DataQualityYAMLCheckOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from datetime import datetime
 
@@ -125,7 +125,7 @@ def test_outside_threshold_eval(mocker):
 def test_invalid_yaml_path():
     yaml_path = YAML_PATH / "nonexistent_file.yaml"
 
-    with pytest.raises(FileExistsError):
+    with pytest.raises(FileNotFoundError):
         DataQualityYAMLCheckOperator(
             task_id='test_task',
             yaml_path=yaml_path
