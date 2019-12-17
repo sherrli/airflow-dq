@@ -2,7 +2,7 @@ import pytest
 import testing.postgresql
 from pathlib import Path
 import psycopg2
-from airflow.operator.data_quality_yaml_check_operator import DataQualityYAMLCheckOperator
+from airflow.operators.data_quality_yaml_check_operator import DataQualityYAMLCheckOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from datetime import datetime
 
@@ -41,7 +41,7 @@ def get_records_mock(sql):
 def test_inside_threshold_values(mocker):
     yaml_path = YAML_PATH / "test_inside_threshold_values.yaml"
 
-    mocker.patch.objects(
+    mocker.patch.object(
         PostgresHook,
         "get_records",
         side_effect=get_records_mock
@@ -62,7 +62,7 @@ def test_inside_threshold_values(mocker):
 def test_outside_threshold_values(mocker):
     yaml_path = YAML_PATH / "test_outside_threshold_values.yaml"
 
-    mocker.patch.objects(
+    mocker.patch.object(
         PostgresHook,
         "get_records",
         side_effect=get_records_mock
@@ -83,7 +83,7 @@ def test_outside_threshold_values(mocker):
 def test_inside_threshold_eval(mocker):
     yaml_path = YAML_PATH / "test_inside_threshold_eval.yaml"
 
-    mocker.patch.objects(
+    mocker.patch.object(
         PostgresHook,
         "get_records",
         side_effect=get_records_mock
@@ -104,7 +104,7 @@ def test_inside_threshold_eval(mocker):
 def test_outside_threshold_eval(mocker):
     yaml_path = YAML_PATH / "test_outside_threshold_eval.yaml"
 
-    mocker.patch.objects(
+    mocker.patch.object(
         PostgresHook,
         "get_records",
         side_effect=get_records_mock
