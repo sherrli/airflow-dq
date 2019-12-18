@@ -22,3 +22,11 @@
 - Test result of dq check is outside threshold values
 - Test result of dq check is within evaluated min/max thresholds
 - Test result of dq check is outside evaluated min/max thresholds
+
+## DataQualityYAMLCheckOperator
+`test_data_quality_yaml_check_operator.py` includes tests for:
+- Loads yaml file to test result of dq check is within threshold values
+- Loads yaml file to test result of dq check is outside threshold values
+- Loads yaml file to test result of dq check is within evaluated min/max thresholds
+- Loads yaml file to test result of dq check is outside evaluated min/max thresholds
+- Test to check exception raised when an invalid yaml path is given.
