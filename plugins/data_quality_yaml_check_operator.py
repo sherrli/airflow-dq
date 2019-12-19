@@ -7,6 +7,13 @@ from data_quality_threshold_check_operator import DataQualityThresholdCheckOpera
 import yaml
 
 class DataQualityYAMLCheckOperator(DataQualityThresholdCheckOperator):
+    '''
+    DataQualityYAMLCheckOperator runs loads configuration parameters from a yaml
+    file and runs a data quality check based off the specifications in the file
+
+    :param yaml_path: path to yaml configuration file with specifications for the test
+    :type yaml_path: str
+    '''
 
     @apply_defaults
     def __init__(self,
