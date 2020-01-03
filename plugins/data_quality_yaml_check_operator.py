@@ -10,7 +10,10 @@ import yaml
 class DataQualityYAMLCheckOperator(DataQualityThresholdCheckOperator):
     '''
     DataQualityYAMLCheckOperator runs loads configuration parameters from a yaml
-    file and runs a data quality check based off the specifications in the file
+    file and runs a data quality check based off the specifications in the file.
+
+    Optionally, if data quality check fails, teams' emails listed in the configuration file 
+    will also be notified by email.
 
     :param yaml_path: path to yaml configuration file with specifications for the test
     :type yaml_path: str
@@ -21,7 +24,6 @@ class DataQualityYAMLCheckOperator(DataQualityThresholdCheckOperator):
                  yaml_path,
                  *args,
                  **kwargs):
-        # super().__init__(*args, **kwargs)
         self.yaml_path = Path(yaml_path)
         with open(self.yaml_path) as configs:
             conf = yaml.full_load(configs)
@@ -38,7 +40,7 @@ class DataQualityYAMLCheckOperator(DataQualityThresholdCheckOperator):
                          push_conn_id=conf.get("fields").get("push_conn_id"),
                          *args,
                          **kwargs)
-        self.emails = conf.get("notification_emails", None)
+        self.emails = conf.get("notification_emails", [])
         self.test_name = conf.get("test_name")
 
     def send_notification(self, info_dict):
