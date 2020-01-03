@@ -2,6 +2,7 @@ from pathlib import Path
 
 from airflow.plugins_manager import AirflowPlugin
 from airflow.utils.decorators import apply_defaults
+from airflow.utils.email import send_email
 from data_quality_threshold_check_operator import DataQualityThresholdCheckOperator
 
 import yaml
@@ -37,9 +38,28 @@ class DataQualityYAMLCheckOperator(DataQualityThresholdCheckOperator):
                          push_conn_id=conf.get("fields").get("push_conn_id"),
                          *args,
                          **kwargs)
+        self.emails = conf.get("notification_emails", None)
+        self.test_name = conf.get("test_name")
+
+    def send_notification(self, info_dict):
+        body = f"""<h1>Data quality check test "{self.test_name}" failed.</h1><br>
+<b>DAG:</b> {self.dag_id}<br>
+<b>Task_id:</b> {info_dict.get("task_id")}<br>
+<b>Check description:</b> {info_dict.get("description")}<br>
+<b>Execution date:</b> {info_dict.get("execution_date")}<br>
+<b>SQL:</b> {self.sql}<br>
+<b>Result:</b> {round(info_dict.get("result"), 2)} is not within thresholds {self.min_threshold} and {self.max_threshold}"""
+        send_email(
+            to=self.emails,
+            subject=f"""Data Quality Check: "{self.test_name}" failed""",
+            html_content=body
+        )
 
     def execute(self, context):
-        return super().execute(context=context)
+        info_dict = super().execute(context=context)
+        if (not info_dict['within_threshold']) and self.emails:
+            self.send_notification(info_dict)
+        return info_dict
 
 class DataQualityYAMLCheckPlugin(AirflowPlugin):
     name = "data_quality_yaml_check_operator"
