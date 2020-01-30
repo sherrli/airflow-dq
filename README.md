@@ -89,3 +89,4 @@ Diagrams below visualize flow of execution when `DataQualityThresholdCheckOperat
 
 ### DataQualityThresholdSQLCheckOperator Flowchart
 ![data_quality_threshold_sql_check_operator diagram](operator_diagrams/data_quality_threshold_sql_check_operator_flowchart.png)
+
